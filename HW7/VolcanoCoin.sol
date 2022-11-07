@@ -21,7 +21,7 @@ contract VolcanoCoin is Ownable {
     event Transfer(address indexed from, address indexed to, uint indexed amount);
 
     mapping(address => uint) public balances;
-    mapping(address => Payment[]) public payments;
+    mapping(address => Payment[]) payments;
 
 
     /**
@@ -59,10 +59,28 @@ contract VolcanoCoin is Ownable {
 
         balances[owner()] -= amount;
         balances[recipient] += amount;
-        payments[owner()].push(Payment({
+        addPaymentRecord(owner(), recipient, amount);
+        emit Transfer(owner(), recipient, amount);
+    }
+
+    /**
+     * @dev View a user's payment records
+     * @param user the user's address
+     */
+    function getPaymentRecords(address user) public view returns (Payment[] memory) {
+        return payments[user];
+    }
+
+    /**
+     * @dev Creates and adds a new record to the user's payment record
+     * @param sender the sender's address
+     * @param recipient the recepient's address
+     * @param amount the payment amount
+     */ 
+    function addPaymentRecord(address sender, address recipient, uint amount) private {
+        payments[sender].push(Payment({
             recipient: recipient,
             amount: amount
         }));
-        emit Transfer(owner(), recipient, amount);
     }
 }
